@@ -77,7 +77,7 @@ function BorderCounter() {
     );
 
     const activeBorders = borders.filter((border) => border.status === "active");
-    
+
     const maxBordersPerPage = 52; // Set max borders per page
     const numPages = Math.ceil(activeBorders.length / maxBordersPerPage);
     const pages = Array.from({ length: numPages }, (_, i) =>
@@ -206,20 +206,20 @@ function BorderCounter() {
             </div>
             {isTokenInputVisible && (
                 <div className="flex gap-x-2 p-2 justify-between items-center">
-                    <input 
-                        type="text" 
-                        placeholder="Enter a name" 
-                        onChange={(e) => setTokenBuyer(e.target.value)} 
-                        className="w-44 h-16 rounded-sm border-1 placeholder:p-2 placeholder-purple-500 border-slate-500" 
+                    <input
+                        type="text"
+                        placeholder="Enter a name"
+                        onChange={(e) => setTokenBuyer(e.target.value)}
+                        className="w-44 h-16 rounded-sm border-1 placeholder:p-2 placeholder-purple-500 border-slate-500"
                     />
-                    <button 
-                        onClick={() => addWithoutBorder(tokenBuyer)} 
+                    <button
+                        onClick={() => addWithoutBorder(tokenBuyer)}
                         className="p-2 flex justify-center items-center bg-teal-500 text-white rounded-md shadow-md hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500"
                     >
                         Add
                     </button>
-                    <button 
-                        onClick={() => removeNameToBorder(tokenBuyer)} 
+                    <button
+                        onClick={() => removeNameToBorder(tokenBuyer)}
                         className="p-2 flex justify-center items-center bg-teal-500 text-white rounded-md shadow-md hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-red-500"
                     >
                         Remove
@@ -247,40 +247,40 @@ function BorderCounter() {
             {/* Table for Active Borders */}
             <div className="w-full mt-8 bg-white shadow-md rounded-lg p-2">
                 <div ref={tableRef}>
-                   
+
                     {/* Table Header for Borders */}
                     {pages.map((pageBorders, pageIndex) => (
                         <div key={pageIndex} className="w-full mt-8 bg-white shadow-md rounded-lg p-2">
-                             <h2 className="text-center text-xl mb-2 font-bold">
-                        ফরিদপুর ইঞ্জিনিয়ারিং কলেজ
-                    </h2>
-                    <h2 className="text-center text-xl mb-2 font-bold">
-                        বঙ্গবন্ধু শেখ মুজিবুর রহমান হল (সাউথ হল)
-                    </h2>
+                            <h2 className="text-center text-xl mb-2 font-bold">
+                                ফরিদপুর ইঞ্জিনিয়ারিং কলেজ
+                            </h2>
+                            <h2 className="text-center text-xl mb-2 font-bold">
+                                বঙ্গবন্ধু শেখ মুজিবুর রহমান হল (সাউথ হল)
+                            </h2>
 
-                    {/* Editable rows: তারিখ and ম্যানেজার */}
-                    <table className="table-auto w-full border-collapse mb-2">
-                        <thead>
-                            <tr>
-                                <th className="border px-1 py-1 text-center">তারিখ</th>
-                                <th className="border px-1 py-1 text-center">নেট মিল</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td className="border px-1 py-1 text-center">
-                                    {new Date().toLocaleDateString("en-BD", {
-                                        day: "numeric",
-                                        month: "long",
-                                        year: "numeric",
-                                    })}
-                                </td>
-                                <td className="border px-1 py-1 text-center">
-                                    {activeBorders.length + 5}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                            {/* Editable rows: তারিখ and ম্যানেজার */}
+                            <table className="table-auto w-full border-collapse mb-2">
+                                <thead>
+                                    <tr>
+                                        <th className="border px-1 py-1 text-center">তারিখ</th>
+                                        <th className="border px-1 py-1 text-center">নেট মিল</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td className="border px-1 py-1 text-center">
+                                            {new Date().toLocaleDateString("en-BD", {
+                                                day: "numeric",
+                                                month: "long",
+                                                year: "numeric",
+                                            })}
+                                        </td>
+                                        <td className="border px-1 py-1 text-center">
+                                            {activeBorders.length + 5}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
 
                             <table className="table-auto w-full border-collapse">
                                 <thead>
@@ -297,9 +297,12 @@ function BorderCounter() {
                                     {Array.from({ length: 26 }, (_, rowIndex) => {
                                         const firstBorder = pageBorders[rowIndex] || {};
                                         const secondBorder = pageBorders[rowIndex + maxBordersPerPage / 2] || {};
-                                        console.log(firstBorder,"first")
-                                        console.log(secondBorder,"second")
-                                        console.log(pageBorders ,"pageborder")
+                                        console.log(firstBorder, "first")
+                                        console.log(secondBorder, "second")
+                                        console.log(pageBorders, "pageborder")
+                                        if (!firstBorder.name && !firstBorder.number && !secondBorder.name && !secondBorder.number) {
+                                            return null;
+                                        }
                                         return (
                                             <tr key={rowIndex}>
                                                 <td className="border px-1 py-1 text-center">

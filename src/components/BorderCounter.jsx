@@ -22,12 +22,7 @@ function BorderCounter() {
 
         if (storedBorders && storedBorders.length > 0) {
             setBorders(storedBorders);
-            setActiveCount(
-                storedBorders.filter((border) => border.status === "active").length
-            );
-            setInactiveCount(
-                storedBorders.filter((border) => border.status === "inactive").length
-            );
+            updateCounts(storedBorders);
         } else {
             const initialBorders = Array.from({ length: 160 }, (_, index) => ({
                 number: index + 1,
@@ -50,29 +45,23 @@ function BorderCounter() {
     useEffect(() => {
         if (borders.length > 0) {
             localStorage.setItem("borders", JSON.stringify(borders));
-            setActiveCount(
-                borders.filter((border) => border.status === "active").length
-            );
-            setInactiveCount(
-                borders.filter((border) => border.status === "inactive").length
-            );
+            updateCounts(borders);
         }
     }, [borders]);
 
     useEffect(() => {
-        const formData = {
-            tarikh,
-            manager,
-            netMeal,
-            bazarKari,
-        };
+        const formData = { tarikh, manager, netMeal, bazarKari };
         localStorage.setItem("formData", JSON.stringify(formData));
     }, [tarikh, manager, netMeal, bazarKari]);
 
+    const updateCounts = (bordersList) => {
+        setActiveCount(bordersList.filter(border => border.status === "active").length);
+        setInactiveCount(bordersList.filter(border => border.status === "inactive").length);
+    };
+
     const toggleBorderStatus = (number) => {
-        console.log(number,"togglenumber")
         setBorders((prevBorders) => {
-            const updatedBorders = prevBorders.map((border) =>
+            return prevBorders.map((border) =>
                 border.number === number
                     ? {
                         ...border,
@@ -80,7 +69,6 @@ function BorderCounter() {
                     }
                     : border
             );
-            return updatedBorders;
         });
     };
 
@@ -89,8 +77,15 @@ function BorderCounter() {
     );
 
     const activeBorders = borders.filter((border) => border.status === "active");
-    const firstPageBorders = activeBorders.slice(0, 80);
-    const secondPageBorders = activeBorders.slice(80, 160);
+    
+    const maxBordersPerPage = 52; // Set max borders per page
+    const numPages = Math.ceil(activeBorders.length / maxBordersPerPage);
+    const pages = Array.from({ length: numPages }, (_, i) =>
+        activeBorders.slice(i * maxBordersPerPage, (i + 1) * maxBordersPerPage)
+    );
+    console.log(pages[0])
+    console.log(pages[1])
+    console.log(pages.length > 0 ? pages[0].length + (pages[1] ? pages[1].length : 0) : 0, "pages");
 
     const saveAsPDF = () => {
         const element = tableRef.current;
@@ -104,19 +99,19 @@ function BorderCounter() {
         html2pdf().from(element).set(opt).save();
     };
 
-    // Function to add a name to a border
     const addNameToBorder = (number) => {
         setBorders((prevBorders) => {
-            return prevBorders.map((border) =>
+            const updatedBorders = prevBorders.map((border) =>
                 border.number === number ? { ...border, name: newName } : border
             );
+            return updatedBorders;
         });
         setNewName("");
         setIsTokenInputVisible(false);
     };
 
     const addWithoutBorder = (name) => {
-        if (!name) return; // Avoid adding empty names
+        if (!name || borders.some(border => border.name === name)) return; // Avoid duplicates
         setBorders((prevBorders) => {
             const nextNumber =
                 prevBorders.length > 160 ? prevBorders.length + 1 : 161;
@@ -131,30 +126,16 @@ function BorderCounter() {
     const removeNameToBorder = (name) => {
         if (!name) return;
 
-
-
-        // Filter out the borders that do not match the given name
-        const remainedBorders = borders.filter(border => border.name !== name && border.number !== name);
-
-        // Assuming setBorders is a function that updates the borders array
+        const remainedBorders = borders.filter(border => border.name !== name);
         setBorders(remainedBorders);
-
-
     };
 
-
-    // Function to process voice commands
     const processVoiceCommand = (command) => {
         const commandParts = command.split(" ");
         const action = commandParts[0]; // "active" or "inactive"
         const numbers = commandParts.slice(1).map(Number); // Convert to numbers
-console.log(commandParts,"command")
-        if (action === "active") {
-            console.log(numbers)
-            numbers.forEach((number) => {
-                toggleBorderStatus(number);
-            });
-        } else if (action === "inactive") {
+
+        if (action === "active" || action === "inactive") {
             numbers.forEach((number) => {
                 toggleBorderStatus(number);
             });
@@ -176,7 +157,6 @@ console.log(commandParts,"command")
         }
     };
 
-    // Function to start voice recognition
     const startVoiceRecognition = () => {
         const recognition = new (window.SpeechRecognition ||
             window.webkitSpeechRecognition)();
@@ -214,34 +194,38 @@ console.log(commandParts,"command")
                     onClick={startVoiceRecognition}
                     className="p-2 flex justify-center items-center bg-purple-500 text-white rounded-md shadow-md hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500"
                 >
-                    <p>
-                        <MdOutlineSettingsVoice />
-                    </p>
+                    <MdOutlineSettingsVoice />
                     Voice Command
-                    <p></p>
                 </button>
                 <button
-                    onClick={() => { setIsTokenInputVisible(!isTokenInputVisible) }}
+                    onClick={() => setIsTokenInputVisible(!isTokenInputVisible)}
                     className="p-2 flex justify-center items-center bg-purple-500 text-white rounded-md shadow-md hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500"
                 >
-
-                    tokens
-                    <p></p>
+                    Tokens
                 </button>
             </div>
-            {
-                isTokenInputVisible && (
-                    <>
-                        <div className="flex gap-x-2 p-2 justify-between items-center">
-                            <input type="text" placeholder="Enter a name" onChange={(e) => {
-                                setTokenBuyer(e.target.value);
-                            }} className=" w-44 h-16 rounded-sm border-1 placeholder:p-2 placeholder-purple-500 border-slate-500" />
-                            <button onClick={() => { addWithoutBorder(tokenBuyer) }} className="p-2 flex justify-center items-center bg-teal-500 text-white rounded-md shadow-md hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500">Add</button>
-                            <button onClick={() => { removeNameToBorder(tokenBuyer) }} className="p-2 flex justify-center items-center bg-teal-500 text-white rounded-md shadow-md hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-red-500">Remove</button>
-                        </div>
-                    </>
-                )
-            }
+            {isTokenInputVisible && (
+                <div className="flex gap-x-2 p-2 justify-between items-center">
+                    <input 
+                        type="text" 
+                        placeholder="Enter a name" 
+                        onChange={(e) => setTokenBuyer(e.target.value)} 
+                        className="w-44 h-16 rounded-sm border-1 placeholder:p-2 placeholder-purple-500 border-slate-500" 
+                    />
+                    <button 
+                        onClick={() => addWithoutBorder(tokenBuyer)} 
+                        className="p-2 flex justify-center items-center bg-teal-500 text-white rounded-md shadow-md hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    >
+                        Add
+                    </button>
+                    <button 
+                        onClick={() => removeNameToBorder(tokenBuyer)} 
+                        className="p-2 flex justify-center items-center bg-teal-500 text-white rounded-md shadow-md hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+                    >
+                        Remove
+                    </button>
+                </div>
+            )}
 
             <div className="flex flex-wrap justify-center items-center p-4 gap-2">
                 {filteredBorders.length > 0 &&
@@ -252,8 +236,7 @@ console.log(commandParts,"command")
                         >
                             <div
                                 onClick={() => toggleBorderStatus(border.number)}
-                                className={`cursor-pointer text-white font-bold w-12 h-12 flex justify-center items-center text-xl rounded-full shadow-md transition-all duration-300 transform hover:scale-110 ${border.status === "inactive" ? "bg-red-500" : "bg-green-500"
-                                    }`}
+                                className={`cursor-pointer text-white font-bold w-12 h-12 flex justify-center items-center text-xl rounded-full shadow-md transition-all duration-300 transform hover:scale-110 ${border.status === "inactive" ? "bg-red-500" : "bg-green-500"}`}
                             >
                                 {border.name || border.number}
                             </div>
@@ -264,7 +247,11 @@ console.log(commandParts,"command")
             {/* Table for Active Borders */}
             <div className="w-full mt-8 bg-white shadow-md rounded-lg p-2">
                 <div ref={tableRef}>
-                    <h2 className="text-center text-xl mb-2 font-bold">
+                   
+                    {/* Table Header for Borders */}
+                    {pages.map((pageBorders, pageIndex) => (
+                        <div key={pageIndex} className="w-full mt-8 bg-white shadow-md rounded-lg p-2">
+                             <h2 className="text-center text-xl mb-2 font-bold">
                         ফরিদপুর ইঞ্জিনিয়ারিং কলেজ
                     </h2>
                     <h2 className="text-center text-xl mb-2 font-bold">
@@ -295,37 +282,43 @@ console.log(commandParts,"command")
                         </tbody>
                     </table>
 
-                    {/* Table Header for Borders */}
-                    <table className="table-auto w-full border-collapse">
-                        <thead>
-                            <tr>
-                                <th className="border px-1 py-1">বর্ডার নং</th>
-                                <th className="border px-1 py-1">দুপুর</th>
-                                <th className="border px-1 py-1">রাত</th>
-                                <th className="border px-1 py-1">বর্ডার নং</th>
-                                <th className="border px-1 py-1">দুপুর</th>
-                                <th className="border px-1 py-1">রাত</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {firstPageBorders.map((border, index) => (
-                                <tr key={index}>
-                                    <td className="border px-1 py-1 text-center">
-                                        {border.name || border.number}
-                                    </td>
-                                    <td className="border px-1 py-1 text-center"></td>
-                                    <td className="border px-1 py-1 text-center"></td>
-                                    <td className="border px-1 py-1 text-center">
-                                        {secondPageBorders[index]?.name ||
-                                            secondPageBorders[index]?.number ||
-                                            ""}
-                                    </td>
-                                    <td className="border px-1 py-1 text-center"></td>
-                                    <td className="border px-1 py-1 text-center"></td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            <table className="table-auto w-full border-collapse">
+                                <thead>
+                                    <tr>
+                                        <th className="border px-1 py-1">বর্ডার নং</th>
+                                        <th className="border px-1 py-1">দুপুর</th>
+                                        <th className="border px-1 py-1">রাত</th>
+                                        <th className="border px-1 py-1">বর্ডার নং</th>
+                                        <th className="border px-1 py-1">দুপুর</th>
+                                        <th className="border px-1 py-1">রাত</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {Array.from({ length: 26 }, (_, rowIndex) => {
+                                        const firstBorder = pageBorders[rowIndex] || {};
+                                        const secondBorder = pageBorders[rowIndex + maxBordersPerPage / 2] || {};
+                                        console.log(firstBorder,"first")
+                                        console.log(secondBorder,"second")
+                                        console.log(pageBorders ,"pageborder")
+                                        return (
+                                            <tr key={rowIndex}>
+                                                <td className="border px-1 py-1 text-center">
+                                                    {firstBorder.name || firstBorder.number || ""}
+                                                </td>
+                                                <td className="border px-1 py-1 text-center"></td>
+                                                <td className="border px-1 py-1 text-center"></td>
+                                                <td className="border px-1 py-1 text-center">
+                                                    {secondBorder.name || secondBorder.number || ""}
+                                                </td>
+                                                <td className="border px-1 py-1 text-center"></td>
+                                                <td className="border px-1 py-1 text-center"></td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                    ))}
                 </div>
                 <button
                     onClick={saveAsPDF}

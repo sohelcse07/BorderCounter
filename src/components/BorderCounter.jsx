@@ -255,27 +255,27 @@ function BorderCounter() {
                                 ফরিদপুর ইঞ্জিনিয়ারিং কলেজ
                             </h2>
                             <h2 className="text-center text-xl mb-2 font-bold">
-                                বঙ্গবন্ধু শেখ মুজিবুর রহমান হল (সাউথ হল)
+                                 (সাউথ হল)
                             </h2>
 
                             {/* Editable rows: তারিখ and ম্যানেজার */}
                             <table className="table-auto w-full border-collapse mb-2">
                                 <thead>
                                     <tr>
-                                        <th className="border px-1 py-1 text-center">তারিখ</th>
-                                        <th className="border px-1 py-1 text-center">নেট মিল</th>
+                                        <th className="border border-black  px-1 py-1 text-center">তারিখ</th>
+                                        <th className="border border-black px-1 py-1 text-center">নেট মিল</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td className="border px-1 py-1 text-center">
+                                        <td className="border border-black text-black font-bold px-1 py-1 text-center">
                                             {new Date().toLocaleDateString("en-BD", {
                                                 day: "numeric",
                                                 month: "long",
                                                 year: "numeric",
                                             })}
                                         </td>
-                                        <td className="border px-1 py-1 text-center">
+                                        <td className="border border-black text-black  font-bold px-1 py-1 text-center">
                                             {activeBorders.length + 5}
                                         </td>
                                     </tr>
@@ -285,12 +285,12 @@ function BorderCounter() {
                             <table className="table-auto w-full border-collapse">
                                 <thead>
                                     <tr>
-                                        <th className="border px-1 py-1">বর্ডার নং</th>
-                                        <th className="border px-1 py-1">দুপুর</th>
-                                        <th className="border px-1 py-1">রাত</th>
-                                        <th className="border px-1 py-1">বর্ডার নং</th>
-                                        <th className="border px-1 py-1">দুপুর</th>
-                                        <th className="border px-1 py-1">রাত</th>
+                                        <th className="border border-black px-1 py-1">বর্ডার নং</th>
+                                        <th className="border border-black px-1 py-1">দুপুর</th>
+                                        <th className="border border-black px-1 py-1">রাত</th>
+                                        <th className="border border-black px-1 py-1">বর্ডার নং</th>
+                                        <th className="border border-black px-1 py-1">দুপুর</th>
+                                        <th className="border border-black px-1 py-1">রাত</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -305,16 +305,16 @@ function BorderCounter() {
                                         }
                                         return (
                                             <tr key={rowIndex}>
-                                                <td className="border px-1 py-1 text-center">
+                                                <td className="border border-black text-black font-semibold px-1 py-1 text-center">
                                                     {firstBorder.name || firstBorder.number || ""}
                                                 </td>
-                                                <td className="border px-1 py-1 text-center"></td>
-                                                <td className="border px-1 py-1 text-center"></td>
-                                                <td className="border px-1 py-1 text-center">
+                                                <td className="border border-black px-1 py-1 text-center"></td>
+                                                <td className="border border-black px-1 py-1 text-center"></td>
+                                                <td className="border border-black px-1 py-1 text-center">
                                                     {secondBorder.name || secondBorder.number || ""}
                                                 </td>
-                                                <td className="border px-1 py-1 text-center"></td>
-                                                <td className="border px-1 py-1 text-center"></td>
+                                                <td className="border border-black px-1 py-1 text-center"></td>
+                                                <td className="border border-black px-1 py-1 text-center"></td>
                                             </tr>
                                         );
                                     })}

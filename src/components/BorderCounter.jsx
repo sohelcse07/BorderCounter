@@ -60,9 +60,10 @@ function BorderCounter() {
     };
 
     const toggleBorderStatus = (number) => {
+        console.log(number,"clicked")
         setBorders((prevBorders) => {
             return prevBorders.map((border) =>
-                border.number === number
+                border.number === number 
                     ? {
                         ...border,
                         status: border.status === "active" ? "inactive" : "active",
@@ -83,9 +84,9 @@ function BorderCounter() {
     const pages = Array.from({ length: numPages }, (_, i) =>
         activeBorders.slice(i * maxBordersPerPage, (i + 1) * maxBordersPerPage)
     );
-    console.log(pages[0])
-    console.log(pages[1])
-    console.log(pages.length > 0 ? pages[0].length + (pages[1] ? pages[1].length : 0) : 0, "pages");
+    // console.log(pages[0])
+    // console.log(pages[1])
+    // console.log(pages.length > 0 ? pages[0].length + (pages[1] ? pages[1].length : 0) : 0, "pages");
 
     const saveAsPDF = () => {
         const element = tableRef.current;
@@ -113,11 +114,10 @@ function BorderCounter() {
     const addWithoutBorder = (name) => {
         if (!name || borders.some(border => border.name === name)) return; // Avoid duplicates
         setBorders((prevBorders) => {
-            const nextNumber =
-                prevBorders.length > 160 ? prevBorders.length + 1 : 161;
+           
             return [
                 ...prevBorders,
-                { number: nextNumber, name: name, status: "active" },
+                { number: prevBorders.length+1, name: name, status: "active" },
             ];
         });
         setNewName(""); // Clear the input after adding
@@ -209,6 +209,7 @@ function BorderCounter() {
                     <input
                         type="text"
                         placeholder="Enter a name"
+                        
                         onChange={(e) => setTokenBuyer(e.target.value)}
                         className="w-44 h-16 rounded-sm border-1 placeholder:p-2 placeholder-purple-500 border-slate-500"
                     />
@@ -297,9 +298,7 @@ function BorderCounter() {
                                     {Array.from({ length: 26 }, (_, rowIndex) => {
                                         const firstBorder = pageBorders[rowIndex] || {};
                                         const secondBorder = pageBorders[rowIndex + maxBordersPerPage / 2] || {};
-                                        console.log(firstBorder, "first")
-                                        console.log(secondBorder, "second")
-                                        console.log(pageBorders, "pageborder")
+                                        
                                         if (!firstBorder.name && !firstBorder.number && !secondBorder.name && !secondBorder.number) {
                                             return null;
                                         }
